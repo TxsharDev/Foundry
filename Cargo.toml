@@ -1,0 +1,57 @@
+[package]
+name = "alia-foundry"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tushar Sharma <txshar@proton.me>"]
+description = "Cast web into native metal. HTML/CSS/JS compiled to GPU-rendered native binaries."
+license = "Apache-2.0"
+repository = "https://github.com/TxsharDev/Foundry"
+keywords = ["compiler", "gpu", "native", "html", "wgpu"]
+categories = ["compilers", "gui", "rendering"]
+
+[lib]
+name = "foundry_runtime"
+path = "src/lib.rs"
+
+[[bin]]
+name = "foundry"
+path = "src/main.rs"
+
+[dependencies]
+# GPU rendering
+wgpu = { version = "29", default-features = false, features = ["wgsl", "vulkan", "metal"] }
+winit = "0.30"
+pollster = "0.4"
+
+# Layout
+taffy = "0.7"
+
+# HTML/CSS parsing
+html5ever = "0.39"
+markup5ever_rcdom = "0.39"
+
+# Byte casting for GPU vertices
+bytemuck = { version = "1", features = ["derive"] }
+
+# Text rendering
+glyphon = "0.11"
+
+# JS engine
+boa_engine = "0.20"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# File watching (dev mode)
+notify = "7"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

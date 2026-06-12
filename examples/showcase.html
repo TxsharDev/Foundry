@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0 }
+            to { opacity: 1 }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0 }
+            to { opacity: 1 }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1 }
+            50% { opacity: 0.6 }
+            100% { opacity: 1 }
+        }
+
+        * { font-family: Arial; }
+
+        body {
+            background-color: #0a0a1a;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 40px;
+            gap: 48px;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            animation: fadeIn 1s;
+        }
+        .hero-badge {
+            background-color: #1a1a3e;
+            border: 1px solid #333366;
+            border-radius: 20px;
+            padding: 6px 20px;
+            font-size: 13px;
+            color: #8888cc;
+        }
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .hero-accent {
+            font-size: 48px;
+            font-weight: bold;
+            color: #f97316;
+        }
+        .hero-subtitle {
+            font-size: 18px;
+            color: #888899;
+            text-align: center;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+        .btn-primary {
+            background-color: #f97316;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #ea580c;
+        }
+        .btn-secondary {
+            background-color: #1a1a3e;
+            border: 1px solid #333366;
+            color: #ccccee;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #2a2a5e;
+            border-color: #5555aa;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 48px;
+            animation: fadeIn 1.5s;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #f97316;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666677;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: flex;
+            gap: 20px;
+            width: 900px;
+            animation: fadeIn 2s;
+        }
+        .feature-card {
+            background-color: #111128;
+            border: 1px solid #222244;
+            border-radius: 16px;
+            padding: 28px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.25s;
+        }
+        .feature-card:hover {
+            background-color: #1a1a40;
+            border-color: #f97316;
+        }
+        .feature-icon {
+            font-size: 28px;
+            color: #f97316;
+        }
+        .feature-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .feature-desc {
+            font-size: 14px;
+            color: #888899;
+            line-height: 1.5;
+        }
+
+        /* Code Block */
+        .code-section {
+            width: 900px;
+            animation: fadeIn 2.5s;
+        }
+        .code-block {
+            background-color: #0d0d24;
+            border: 1px solid #222244;
+            border-radius: 12px;
+            padding: 24px;
+            font-size: 14px;
+            color: #a0a0c0;
+            line-height: 1.6;
+        }
+        .code-comment {
+            color: #555577;
+            font-size: 14px;
+        }
+        .code-keyword {
+            color: #c084fc;
+            font-size: 14px;
+        }
+        .code-string {
+            color: #34d399;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            font-size: 13px;
+            color: #444455;
+            animation: pulse 3s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-badge">Open Source - Apache 2.0</div>
+        <div style="display: flex; gap: 12px">
+            <span class="hero-title">Cast Web Into</span>
+            <span class="hero-accent">Native Metal</span>
+        </div>
+        <div class="hero-subtitle">HTML/CSS/JS compiled to GPU-rendered native binaries. No browser. No webview. 7.6MB.</div>
+        <div class="hero-buttons">
+            <div class="btn-primary" onclick="install()">cargo install alia-foundry</div>
+            <div class="btn-secondary" onclick="docs()">Read the Docs</div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number">7.6</div>
+            <div class="stat-label">MB Binary</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">25x</div>
+            <div class="stat-label">Smaller Than Electron</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Browser Dependencies</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">60</div>
+            <div class="stat-label">FPS GPU Rendering</div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">GPU</div>
+            <div class="feature-title">GPU-Native Rendering</div>
+            <div class="feature-desc">Every pixel drawn by the GPU via Vulkan/Metal. SDF shaders for anti-aliased rounded corners and borders.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">CSS</div>
+            <div class="feature-title">Compile-Time CSS</div>
+            <div class="feature-desc">Cascade and specificity resolved once at load time. No per-frame style recalculation. Static styles never recompute.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">JS</div>
+            <div class="feature-title">Embedded JS Engine</div>
+            <div class="feature-desc">Event handlers, DOM mutations, and state management via boa. No V8 required. Pure Rust execution.</div>
+        </div>
+    </div>
+
+    <!-- Code Example -->
+    <div class="code-section">
+        <div class="code-block">
+            <div class="code-comment"># Write HTML</div>
+            <div>foundry dev index.html</div>
+            <div style="height: 12px"></div>
+            <div class="code-comment"># Compile to native binary</div>
+            <div>foundry build index.html -o myapp.exe</div>
+            <div style="height: 12px"></div>
+            <div class="code-comment"># Run standalone - no Foundry needed</div>
+            <div>./myapp.exe</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">Built by Tushar Sharma at ALIA Labs</div>
+
+    <script>
+        function install() {
+            console.log("cargo install alia-foundry");
+        }
+        function docs() {
+            console.log("Opening documentation...");
+        }
+    </script>
+</body>
+</html>

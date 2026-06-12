@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        * {
+            font-family: Arial;
+        }
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f97316;
+        }
+        .status {
+            background-color: #065f46;
+            color: #34d399;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Stats Grid */
+        .stats {
+            display: flex;
+            gap: 16px;
+        }
+        .stat-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            background-color: #334155;
+            border-color: #475569;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+        .stat-change {
+            font-size: 13px;
+            color: #34d399;
+        }
+        .stat-change-down {
+            font-size: 13px;
+            color: #f87171;
+        }
+
+        /* Table */
+        .table {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .table-header {
+            display: flex;
+            padding: 16px 20px;
+            border-radius: 12px 12px 0 0;
+            background-color: #0f172a;
+            font-size: 13px;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+        .table-row {
+            display: flex;
+            padding: 14px 20px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+        .table-row:hover {
+            background-color: #334155;
+        }
+        .col-name { width: 200px; }
+        .col-status { width: 120px; }
+        .col-latency { width: 120px; }
+        .col-requests { width: 140px; }
+        .col-errors { width: 100px; }
+
+        .badge-up {
+            background-color: #065f46;
+            color: #34d399;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .badge-warn {
+            background-color: #78350f;
+            color: #fbbf24;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .badge-down {
+            background-color: #7f1d1d;
+            color: #f87171;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Sidebar actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        .action-btn {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background-color: #f97316;
+            border-color: #f97316;
+            color: white;
+        }
+        .action-primary {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+        .action-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">FOUNDRY DASHBOARD</div>
+        <div class="status">All Systems Operational</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">Total Requests</div>
+            <div id="requests" class="stat-value">1,284,391</div>
+            <div class="stat-change">+12.5% from last hour</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg Latency</div>
+            <div class="stat-value">23ms</div>
+            <div class="stat-change">-8.2% from last hour</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Error Rate</div>
+            <div class="stat-value">0.02%</div>
+            <div class="stat-change">-15% from last hour</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Active Users</div>
+            <div class="stat-value">8,421</div>
+            <div class="stat-change-down">-3.1% from last hour</div>
+        </div>
+    </div>
+
+    <!-- Service Table -->
+    <div class="table">
+        <div class="table-header">
+            <div class="col-name">Service</div>
+            <div class="col-status">Status</div>
+            <div class="col-latency">P99 Latency</div>
+            <div class="col-requests">Requests/sec</div>
+            <div class="col-errors">Errors</div>
+        </div>
+        <div class="table-row">
+            <div class="col-name">api-gateway</div>
+            <div class="col-status"><span class="badge-up">Healthy</span></div>
+            <div class="col-latency">12ms</div>
+            <div class="col-requests">45,291</div>
+            <div class="col-errors">3</div>
+        </div>
+        <div class="table-row">
+            <div class="col-name">auth-service</div>
+            <div class="col-status"><span class="badge-up">Healthy</span></div>
+            <div class="col-latency">8ms</div>
+            <div class="col-requests">12,847</div>
+            <div class="col-errors">0</div>
+        </div>
+        <div class="table-row">
+            <div class="col-name">inference-engine</div>
+            <div class="col-status"><span class="badge-warn">Degraded</span></div>
+            <div class="col-latency">142ms</div>
+            <div class="col-requests">3,291</div>
+            <div class="col-errors">47</div>
+        </div>
+        <div class="table-row">
+            <div class="col-name">model-cache</div>
+            <div class="col-status"><span class="badge-up">Healthy</span></div>
+            <div class="col-latency">2ms</div>
+            <div class="col-requests">89,102</div>
+            <div class="col-errors">0</div>
+        </div>
+        <div class="table-row">
+            <div class="col-name">vector-db</div>
+            <div class="col-status"><span class="badge-down">Down</span></div>
+            <div class="col-latency">--</div>
+            <div class="col-requests">0</div>
+            <div class="col-errors">1,203</div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <div class="action-btn action-primary" onclick="refresh()">Refresh Data</div>
+        <div class="action-btn" onclick="deploy()">Deploy</div>
+        <div class="action-btn" onclick="rollback()">Rollback</div>
+        <div class="action-btn" onclick="alert_toggle()">Silence Alerts</div>
+    </div>
+
+    <script>
+        var requestCount = 1284391;
+        function refresh() {
+            requestCount = requestCount + Math.floor(Math.random() * 1000);
+            var formatted = String(requestCount).replace(/(\d)(?=(\d{3})+$)/g, "$1,");
+            document.getElementById("requests").setTextContent(formatted);
+            console.log("Data refreshed: " + String(requestCount) + " requests");
+        }
+        function deploy() {
+            console.log("Deployment triggered");
+        }
+        function rollback() {
+            console.log("Rollback initiated");
+        }
+        function alert_toggle() {
+            console.log("Alerts silenced for 30 minutes");
+        }
+    </script>
+</body>
+</html>

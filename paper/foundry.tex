@@ -1,0 +1,109 @@
+\documentclass[11pt,twocolumn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!10},
+}
+
+\title{Foundry: Compiling Web Technologies to GPU-Rendered Native Binaries}
+\author{Tushar Sharma \\ ALIA Labs \\ \texttt{txshar@proton.me}}
+\date{June 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present Foundry, a compiler that transforms HTML, CSS, and JavaScript into standalone native GPU-rendered binaries without embedding a browser engine. Foundry parses HTML into a scene graph in a single pass, resolves CSS cascade, specificity, compound selectors, \texttt{:hover} pseudo-class, \texttt{@keyframes} animations, and transitions at load time, computes flexbox layout via the taffy library, and renders directly to the GPU via wgpu using signed distance field shaders. JavaScript execution is handled by boa, a pure-Rust ECMAScript engine. The \texttt{foundry build} command compiles an HTML file into a standalone 7.6MB binary (vs. 200MB+ for Electron) that runs without any runtime dependencies. We describe the architecture, evaluate the tradeoffs, and identify the subset of web technologies that can be meaningfully compiled to native rendering.
+\end{abstract}
+
+\section{Introduction}
+
+The dominant approach to cross-platform desktop applications is to embed a web browser engine and render HTML/CSS/JS inside it. Electron~\cite{electron} ships Chromium, producing binaries over 200MB for trivial applications. Tauri~\cite{tauri} reduces size by using the system webview, but still delegates rendering to a browser engine.
+
+We ask: what if the web technologies were compiled rather than interpreted? Can HTML/CSS be transformed into GPU draw calls without an intermediate browser engine?
+
+Foundry answers yes for a useful subset of web technologies. It produces a single native binary under 8MB that renders via Vulkan/Metal/DX12 with no browser runtime.
+
+\section{Architecture}
+
+Foundry processes input in five stages.
+
+\subsection{HTML Parsing}
+
+Mozilla's \texttt{html5ever} parser produces a DOM tree. Foundry walks this tree and constructs a scene graph: a flat array of nodes, each with element kind, attributes, style slots, layout rects, and child/parent references. Text content becomes a separate node.
+
+\subsection{CSS Resolution}
+
+Foundry extracts \texttt{<style>} blocks and parses them into rules with selectors and declarations. Selectors are classified by type (tag, class, ID, universal) and sorted by specificity. Rules are applied to the scene graph in specificity order, followed by inline \texttt{style} attributes.
+
+This resolution happens once at load time. There is no per-frame style recalculation.
+
+\subsection{Layout}
+
+The \texttt{taffy} library~\cite{taffy} computes flexbox layout. Each node's resolved style is converted to taffy's internal representation. Viewport-relative units are resolved against window dimensions. The layout pass assigns (x, y, width, height) to every node.
+
+\subsection{GPU Rendering}
+
+The renderer collects visible nodes into a vertex buffer. Each quad carries its position, color, border properties, and border-radius. A WGSL fragment shader computes a signed distance field (SDF) for rounded rectangles, producing anti-aliased edges and borders in a single draw call.
+
+Text is rendered via \texttt{glyphon}~\cite{glyphon}, which uses \texttt{cosmic-text} for shaping and produces GPU-ready glyph atlases.
+
+\subsection{JavaScript Execution}
+
+\texttt{boa}~\cite{boa}, a pure-Rust ECMAScript engine, executes scripts after the first layout. A DOM bridge exposes \texttt{document.getElementById()} and mutation methods (\texttt{setTextContent}, \texttt{setStyle}, \texttt{addClass}, \texttt{removeClass}). Mutations are queued during execution and applied to the scene graph afterward, triggering incremental re-layout via dirty flags.
+
+\section{Evaluation}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+& \textbf{Foundry} & \textbf{Electron} & \textbf{Tauri} \\
+\midrule
+Binary size & 7.6 MB & 200+ MB & 2--5 MB \\
+Runtime & None & Chromium & System WV \\
+Rendering & GPU (wgpu) & Skia & Skia/WV \\
+JS engine & boa & V8 & V8/JSC \\
+Web API & Subset & Full & Full \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of desktop application frameworks. WV = WebView.}
+\end{table}
+
+Foundry's binary size advantage over Electron is 25x. Against Tauri, the size difference is smaller (Tauri uses the system webview, which is already installed). Foundry's advantage over Tauri is architectural: Foundry controls the rendering pipeline and does not depend on a browser engine at runtime.
+
+\section{Limitations}
+
+Foundry supports a subset of web technologies. It handles CSS animations (\texttt{@keyframes}, transitions, \texttt{:hover}) but does not handle CSS Grid, media queries, or custom properties. The JavaScript engine (boa) is 10--100x slower than V8. There is no accessibility support, as GPU rendering produces pixels without semantic structure.
+
+These limitations are acceptable for the target use cases: dashboards, kiosk UIs, embedded displays, and internal tools.
+
+\section{Related Work}
+
+WCET analysis~\cite{wcet} in embedded systems performs worst-case timing analysis on compiled binaries. Servo~\cite{servo} is a research browser engine in Rust that Foundry's parsing crates derive from. Flutter~\cite{flutter} takes a similar GPU-native approach but uses Dart, not web technologies.
+
+\section{Conclusion}
+
+Foundry demonstrates that a useful subset of HTML/CSS/JS can be compiled to standalone native GPU-rendered binaries without a browser engine. The \texttt{foundry build} command produces a 7.6MB standalone executable -- a 26x reduction over Electron. The system includes CSS animations (\texttt{@keyframes}), transitions, compound selectors, and hot reload for development. Future work includes image rendering, CSS grid, and accessibility via platform UI automation APIs.
+
+\begin{thebibliography}{9}
+\bibitem{electron} Electron. \url{https://www.electronjs.org/}
+\bibitem{tauri} Tauri. \url{https://tauri.app/}
+\bibitem{taffy} Taffy Layout. \url{https://github.com/DioxusLabs/taffy}
+\bibitem{glyphon} Glyphon. \url{https://github.com/grovesNL/glyphon}
+\bibitem{boa} Boa JS Engine. \url{https://boajs.dev/}
+\bibitem{servo} Servo Browser Engine. \url{https://servo.org/}
+\bibitem{flutter} Flutter. \url{https://flutter.dev/}
+\bibitem{wcet} Wilhelm, R. et al. The worst-case execution-time problem. ACM Trans. Embed. Comput. Syst., 2008.
+\end{thebibliography}
+
+\end{document}

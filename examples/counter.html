@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial;
+        }
+        .card {
+            background-color: #16213e;
+            padding: 40px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #e94560;
+        }
+        .count {
+            font-size: 64px;
+            font-weight: bold;
+            color: #0f3460;
+        }
+        .buttons {
+            display: flex;
+            gap: 16px;
+        }
+        .btn {
+            background-color: #e94560;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #c73650;
+        }
+        .btn-reset {
+            background-color: #533483;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .btn-reset:hover {
+            background-color: #6b44a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Foundry Counter</h1>
+        <div id="count" class="count">0</div>
+        <div class="buttons">
+            <div class="btn" onclick="decrement()">-</div>
+            <div class="btn" onclick="increment()">+</div>
+        </div>
+        <div class="btn-reset" onclick="reset()">Reset</div>
+    </div>
+
+    <script>
+        var count = 0;
+        function increment() {
+            count = count + 1;
+            document.getElementById("count").setTextContent(String(count));
+        }
+        function decrement() {
+            count = count - 1;
+            document.getElementById("count").setTextContent(String(count));
+        }
+        function reset() {
+            count = 0;
+            document.getElementById("count").setTextContent("0");
+        }
+    </script>
+</body>
+</html>
