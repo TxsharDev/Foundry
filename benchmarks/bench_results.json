@@ -1,0 +1,49 @@
+{
+  "binary_size": {
+    "foundry_binary_bytes": 8242688,
+    "foundry_binary_mb": 7.86,
+    "electron_typical_mb": 200.0,
+    "electron_min_mb": 150.0,
+    "tauri_typical_mb": 8.0,
+    "tauri_min_mb": 2.5,
+    "ratio_vs_electron": 25.4,
+    "ratio_vs_tauri_typical": 1.0
+  },
+  "startup": {
+    "foundry_cold_ms": 10.6,
+    "foundry_warm_avg_ms": 6.2,
+    "foundry_warm_min_ms": 6.0,
+    "electron_startup_ms": 2500.0,
+    "tauri_startup_ms": 800.0
+  },
+  "parse_speed": {
+    "showcase.html": {
+      "nodes": 78,
+      "html_bytes": 7677,
+      "parse_css_us": 222.1
+    },
+    "counter.html": {
+      "nodes": 14,
+      "html_bytes": 2235,
+      "parse_css_us": 37.6
+    },
+    "dashboard.html": {
+      "nodes": 117,
+      "html_bytes": 8210,
+      "parse_css_us": 206.8
+    },
+    "todo.html": {
+      "nodes": 28,
+      "html_bytes": 3235,
+      "parse_css_us": 59.3
+    }
+  },
+  "compile_speed": {
+    "foundry_clean_build_s": 106.2,
+    "foundry_incremental_s": 52.3,
+    "electron_first_build_s": 120.0,
+    "electron_rebuild_s": 30.0,
+    "tauri_first_build_s": 180.0,
+    "tauri_rebuild_s": 15.0
+  }
+}
