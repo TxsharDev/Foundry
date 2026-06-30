@@ -16,13 +16,12 @@ fn test_localstorage_set_get() {
         .unwrap();
 
     // Verify via JS — getItem returns the value
-    let result = engine
-        .execute(
-            r#"
+    let result = engine.execute(
+        r#"
             var v = localStorage.getItem("key1");
             console.log(v);
         "#,
-        );
+    );
     assert!(result.is_ok());
 }
 

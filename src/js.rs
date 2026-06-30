@@ -29,9 +29,9 @@ impl LocalStorage {
         };
         if let Some(path) = &file_path {
             if let Ok(content) = std::fs::read_to_string(path) {
-                if let Ok(map) = serde_json::from_str::<std::collections::HashMap<String, String>>(
-                    &content,
-                ) {
+                if let Ok(map) =
+                    serde_json::from_str::<std::collections::HashMap<String, String>>(&content)
+                {
                     storage.data = map;
                 }
             }
@@ -285,7 +285,13 @@ impl JsEngine {
                 })
             };
             let js_func = func.to_js_function(self.context.realm());
-            ls.set(boa_engine::js_string!("getItem"), js_func, false, &mut self.context).ok();
+            ls.set(
+                boa_engine::js_string!("getItem"),
+                js_func,
+                false,
+                &mut self.context,
+            )
+            .ok();
         }
 
         // setItem(key, value)
@@ -307,7 +313,13 @@ impl JsEngine {
                 })
             };
             let js_func = func.to_js_function(self.context.realm());
-            ls.set(boa_engine::js_string!("setItem"), js_func, false, &mut self.context).ok();
+            ls.set(
+                boa_engine::js_string!("setItem"),
+                js_func,
+                false,
+                &mut self.context,
+            )
+            .ok();
         }
 
         // removeItem(key)
@@ -325,7 +337,13 @@ impl JsEngine {
                 })
             };
             let js_func = func.to_js_function(self.context.realm());
-            ls.set(boa_engine::js_string!("removeItem"), js_func, false, &mut self.context).ok();
+            ls.set(
+                boa_engine::js_string!("removeItem"),
+                js_func,
+                false,
+                &mut self.context,
+            )
+            .ok();
         }
 
         // clear()
@@ -339,7 +357,13 @@ impl JsEngine {
                 })
             };
             let js_func = func.to_js_function(self.context.realm());
-            ls.set(boa_engine::js_string!("clear"), js_func, false, &mut self.context).ok();
+            ls.set(
+                boa_engine::js_string!("clear"),
+                js_func,
+                false,
+                &mut self.context,
+            )
+            .ok();
         }
 
         self.context
@@ -367,7 +391,7 @@ impl JsEngine {
                 ureq::config::Config::builder()
                     .timeout_connect(Some(std::time::Duration::from_secs(5)))
                     .timeout_recv_body(Some(std::time::Duration::from_secs(10)))
-                    .build()
+                    .build(),
             );
 
             match agent.get(&url).call() {
@@ -383,7 +407,7 @@ impl JsEngine {
                     result
                         .set(
                             boa_engine::js_string!("ok"),
-                            JsValue::from(status >= 200 && status < 300),
+                            JsValue::from((200..300).contains(&status)),
                             false,
                             ctx,
                         )
