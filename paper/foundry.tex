@@ -33,7 +33,7 @@ The cost is concrete. An Electron hello-world takes 2--5 seconds to reach first 
 
 We ask: for applications that use a known subset of HTML/CSS/JS, can we compile the web technologies directly into GPU draw calls and skip the browser engine entirely?
 
-Foundry answers yes. It is a Rust compiler (4,247 lines across 10 modules) that reads an HTML file, resolves CSS at load time, computes flexbox layout, and renders via Vulkan/Metal/DX12. The \texttt{foundry build} command produces a self-contained native binary under 8\,MB with zero runtime dependencies.
+Foundry answers yes. It is a Rust compiler (4,417 lines across 10 modules) that reads an HTML file, resolves CSS at load time, computes flexbox layout, and renders via Vulkan/Metal/DX12. The \texttt{foundry build} command produces a self-contained native binary under 8\,MB with zero runtime dependencies.
 
 This paper describes the architecture, reports measured performance, and discusses the tradeoffs of compiling web technologies rather than interpreting them.
 
@@ -231,7 +231,7 @@ Rendering & GPU (wgpu) & Skia/Blink & Skia/WV \\
 JS engine & boa & V8 & V8/JSC \\
 Web API & Subset & Full & Full \\
 Startup & 6 ms & 2,500 ms & 800 ms \\
-Source (Rust) & 4,247 LOC & N/A & N/A \\
+Source (Rust) & 4,417 LOC & N/A & N/A \\
 \bottomrule
 \end{tabular}
 \caption{Architecture comparison. WV = WebView, JSC = JavaScriptCore.}
@@ -250,12 +250,63 @@ Foundry consists of 10 Rust source files totaling 4,247 lines:
 \item \textbf{layout.rs} (305 lines): Flexbox layout via taffy. Style conversion, viewport unit resolution, text size estimation, scroll content height.
 \item \textbf{html.rs} (296 lines): HTML parser. Single-pass DOM walk producing scene graph + extracted styles/scripts.
 \item \textbf{events.rs} (261 lines): Event system. Hit testing, hover state management, scroll handling, click event bubbling, transition triggers.
-\item \textbf{js.rs} (250 lines): JavaScript engine. boa integration, DOM bridge (\texttt{getElementById}, mutations), \texttt{console.log}.
+\item \textbf{js.rs} (420 lines): JavaScript engine. boa integration, DOM bridge (\texttt{getElementById}, mutations), \texttt{console.log}, localStorage (file-backed), fetch (ureq with timeouts).
 \item \textbf{lib.rs} (230 lines): Library entry point. \texttt{run\_embedded} for compiled binaries, embedded app event loop.
 \item \textbf{text.rs} (156 lines): Text rendering via glyphon. Font system, glyph atlas, text area collection, weight/family mapping.
 \end{itemize}
 
-The project includes 27 tests covering color parsing, length units, CSS selectors, specificity, keyframes, style interpolation, hover styles, and HTML parsing.
+The project includes 68 tests covering color parsing, length units, CSS selectors, specificity, keyframes, style interpolation, hover styles, HTML parsing, localStorage persistence, fetch API, and DOM mutations.
+
+\section{v0.2: Persistence and Data Access}
+
+Foundry v0.1 was a renderer. v0.2 adds two APIs that make it an app platform:
+native persistence and HTTP data access, both exposed through the JavaScript bridge.
+
+\subsection{localStorage}
+
+A file-backed key-value store with the browser localStorage API:
+
+\begin{lstlisting}[language={}]
+localStorage.setItem("user", "tushar");
+var name = localStorage.getItem("user");
+localStorage.removeItem("user");
+localStorage.clear();
+\end{lstlisting}
+
+Data persists to a JSON file on disk using atomic writes (temp file + rename)
+to prevent corruption on crash or disk-full. The storage is backed by a
+\texttt{HashMap<String, String>} serialized via serde\_json. On startup,
+existing data is loaded from the storage file if present.
+
+\subsection{fetch()}
+
+Synchronous HTTP via native Rust networking (ureq):
+
+\begin{lstlisting}[language={}]
+var resp = fetch("https://api.example.com/data");
+if (resp.ok) {
+    console.log(resp.text);
+}
+\end{lstlisting}
+
+Returns \texttt{\{ok, status, text\}}. No Promise chains---the call blocks
+and returns the response directly. Timeouts are enforced (5s connect, 10s read)
+to prevent UI freezes, and the response body is capped at 4\,MB to prevent
+unbounded memory allocation from remote servers.
+
+\subsection{Testing}
+
+The v0.2 JS APIs are validated with 12 new tests (plus 1 network test
+gated with \texttt{\#[ignore]}):
+
+\begin{itemize}
+  \item localStorage: set/get, missing key returns null, remove, clear,
+    overwrite, file persistence across engine instances
+  \item fetch: returns correct object shape, handles connection errors gracefully
+  \item DOM mutations: regression tests for setTextContent, setStyle, addClass, removeClass
+\end{itemize}
+
+Total test count: 55 parser tests + 12 JS API tests + 1 ignored network test.
 
 \section{Limitations}
 
@@ -291,12 +342,12 @@ Foundry demonstrates that a useful subset of HTML/CSS/JS can be compiled to stan
 \item 7.86\,MB binary -- 25x smaller than Electron
 \item 6\,ms startup -- 400x faster than Electron
 \item 222\,\textmu s parse+CSS for a 78-node page
-\item 4,247 lines of Rust, 27 tests, 10 modules
+\item 4,417 lines of Rust, 68 tests, 10 modules
 \end{itemize}
 
 The system includes CSS animations (\texttt{@keyframes}), transitions, compound selectors with descendant matching, hover state management, event bubbling, scroll containers, hot reload, and a build pipeline that produces self-contained executables.
 
-Future work includes image rendering, CSS Grid layout, accessibility via platform UI automation APIs, and WebSocket/fetch support for network-connected applications.
+Future work includes image rendering, CSS Grid layout, accessibility via platform UI automation APIs, incremental layout diffing (diff the layout tree directly rather than re-running the full CSS cascade on every mutation), and WebSocket support for real-time applications.
 
 \begin{thebibliography}{9}
 \bibitem{electron} Electron. \url{https://www.electronjs.org/}

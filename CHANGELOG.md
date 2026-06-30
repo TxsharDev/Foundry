@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.2.0 (2026-06-30)
+
+Persistence and data access. From renderer to app platform.
+
+### Added
+- **localStorage API** — native file-backed key-value storage exposed via JS bridge
+  - `getItem(key)`, `setItem(key, value)`, `removeItem(key)`, `clear()`
+  - Persists to JSON file on disk, survives app restarts
+  - Same API as browser localStorage
+- **fetch() API** — synchronous HTTP via native Rust networking (ureq)
+  - Returns `{ ok, status, text }` object
+  - No Promise chains — blocking call, suitable for native apps
+- **Dependencies**: serde, serde_json, ureq
+- **12 new tests** (+ 1 network test gated with `#[ignore]`) in `tests/js_api_tests.rs`
+  - localStorage: set/get, missing key returns null, remove, clear, overwrite, file persistence
+  - fetch: returns object structure, handles bad URLs gracefully
+  - DOM mutations: regression tests for setTextContent, setStyle, addClass, removeClass
+
+### Changed
+- `JsEngine::new()` now also registers localStorage and fetch APIs
+- `JsEngine::with_storage_path()` constructor for file-backed persistence
+- Version bump to 0.2.0
+
+### Testing
+- 67 total tests pass (55 existing + 12 new)
+- Zero warnings on `cargo build`
+
+---
+
 ## v0.1.0 (2026-06-11)
 
 ### Binary Compilation
